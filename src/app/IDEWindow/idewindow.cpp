@@ -1,23 +1,22 @@
-#include "mainwindow.h"
-#include "filetreeview.h"
-#include "filecreatedialog.h"
-#include "./ui_mainwindow.h"
+#include "idewindow.h"
+#include "dialogs/filecreatedialog.h"
+#include "./ui_idewindow.h"
 #include "QFileSystemModel"
 #include "QMessageBox"
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <QStandardPaths>
 
-MainWindow::MainWindow(QString ProjectPath, QJsonObject ProjectInfo, QWidget *parent)
+IDEWindow::IDEWindow(QString ProjectPath, QJsonObject ProjectInfo, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
 
     ui->setupUi(this);
-
+    this->setWindowState(Qt::WindowMaximized);
     SaveProjectInCache(ProjectPath);
 
-    QFile file(":/style.qss");
+    QFile file(":/styles/style.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
@@ -59,7 +58,7 @@ MainWindow::MainWindow(QString ProjectPath, QJsonObject ProjectInfo, QWidget *pa
     ui->filesTabWidget->setTabsClosable(true);
     ui->filesTabWidget->setMovable(true);
 
-    connect(ui->actionSave_File, &QAction::triggered, this, &MainWindow::onSaveFile);
+    connect(ui->actionSave_File, &QAction::triggered, this, &IDEWindow::onSaveFile);
 
     connect(ui->filesTabWidget, &QTabWidget::tabCloseRequested,
             this, [=](int index){
@@ -72,17 +71,17 @@ MainWindow::MainWindow(QString ProjectPath, QJsonObject ProjectInfo, QWidget *pa
 
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->treeView, &QTreeView::customContextMenuRequested,
-            this, &MainWindow::onTreeContextMenu);
+            this, &IDEWindow::onTreeContextMenu);
 
 
 }
 
-MainWindow::~MainWindow()
+IDEWindow::~IDEWindow()
 {
     delete ui;
 }
 
-void MainWindow::SaveProjectInCache(const QString project_path){
+void IDEWindow::SaveProjectInCache(const QString project_path){
     QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir(dataDir).mkpath(".");
     QFile history_file(dataDir+"/"+"history_open_projects.dat");
@@ -108,12 +107,12 @@ void MainWindow::SaveProjectInCache(const QString project_path){
     history_file.close();
 }
 
-void MainWindow::onSaveFile()
+void IDEWindow::onSaveFile()
 {
     ui->filesTabWidget->saveCurrentFile();
 }
 
-void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
+void IDEWindow::on_treeView_doubleClicked(const QModelIndex &index)
 {
     auto *model = static_cast<QFileSystemModel*>(ui->treeView->model());
     if (model->isDir(index)) return;
@@ -125,12 +124,12 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index)
 }
 
 
-void MainWindow::on_treeView_clicked(const QModelIndex &index)
+void IDEWindow::on_treeView_clicked(const QModelIndex &index)
 {
 
 }
 
-void MainWindow::onTreeContextMenu(const QPoint &pos)
+void IDEWindow::onTreeContextMenu(const QPoint &pos)
 {
     QModelIndex index = ui->treeView->indexAt(pos); // индекс под курсором
 

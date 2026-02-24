@@ -1,7 +1,7 @@
 #ifndef WELCOMEFORM_H
 #define WELCOMEFORM_H
 
-#include "clickablelineedit.h"
+#include "widgets/clickablelineedit.h"
 #include <QWidget>
 #include <qcombobox.h>
 #include <qlabel.h>

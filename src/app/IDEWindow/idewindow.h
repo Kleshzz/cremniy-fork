@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef IDEWINDOW_H
+#define IDEWINDOW_H
 
 #include <QMainWindow>
 
@@ -9,13 +9,13 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
+class IDEWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QString ProjectPath, QJsonObject ProjectInfo, QWidget *parent = nullptr);
-    ~MainWindow() override;
+    explicit IDEWindow(QString ProjectPath, QJsonObject ProjectInfo, QWidget *parent = nullptr);
+    ~IDEWindow() override;
 
 private slots:
     void on_treeView_doubleClicked(const QModelIndex &index);
@@ -31,4 +31,4 @@ private:
     void SaveProjectInCache(const QString project_path);
     void openDirectory(const QString &path);
 };
-#endif // MAINWINDOW_H
+#endif // IDEWINDOW_H

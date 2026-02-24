@@ -16,35 +16,40 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-
 )
 
 add_subdirectory(codeeditor)
 
-
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(untitled1
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+        main.cpp
 
-        filetreeview.h filetreeview.cpp
-        filecreatedialog.h filecreatedialog.cpp
-        tooltab.h tooltab.cpp
+        app/IDEWindow/idewindow.cpp
+        app/IDEWindow/idewindow.h
+        app/IDEWindow/idewindow.ui
+        app/WelcomeWindow/welcomeform.cpp
+        app/WelcomeWindow/welcomeform.h
+        app/WelcomeWindow/welcomeform.ui
 
-        resources.qrc
-        style.qss
-        style.qss
-        iconprovider.h iconprovider.cpp
-        codeeditor/CMakeLists.txt
-        filestabwidget.h filestabwidget.cpp
-        filetab.h filetab.cpp
+        dialogs/filecreatedialog.cpp
+        dialogs/filecreatedialog.h
 
-        welcomeform.h welcomeform.cpp welcomeform.ui
-        clickablelineedit.h clickablelineedit.cpp
+        widgets/clickablelineedit.cpp
+        widgets/clickablelineedit.h
+        widgets/filestabwidget.cpp
+        widgets/filestabwidget.h
+        widgets/filetab.cpp
+        widgets/filetab.h
+        widgets/filetreeview.cpp
+        widgets/filetreeview.h
+        widgets/tooltab.cpp
+        widgets/tooltab.h
 
+        utils/iconprovider.cpp
+        utils/iconprovider.h
+
+        resources/cremniy_res.qrc
     )
     target_include_directories(untitled1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # Define target properties for Android with Qt 6 as:

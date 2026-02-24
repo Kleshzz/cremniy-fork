@@ -1,7 +1,6 @@
 #include "welcomeform.h"
-#include "createprojectform.h"
-#include "mainwindow.h"
-#include "tooltab.h"
+#include "app/IDEWindow/idewindow.h"
+#include "widgets/tooltab.h"
 #include "ui_welcomeform.h"
 #include <qboxlayout.h>
 #include <qdir.h>
@@ -26,7 +25,7 @@ WelcomeForm::WelcomeForm(QWidget *parent)
     ui->setupUi(this);
 
 
-    QFile file(":/style.qss");
+    QFile file(":/styles/style.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
@@ -163,7 +162,8 @@ void WelcomeForm::OpenProjectHandler()
     dlg.setDirectory(QDir::homePath());
 
     if (dlg.exec() == QDialog::Accepted) {
-        OpenProject(dlg.selectedFiles().first());
+        QFileInfo f(dlg.selectedFiles().first());
+        OpenProject(f.dir().path());
     }
 }
 
@@ -181,7 +181,8 @@ void WelcomeForm::OpenProject(QString path){
     QJsonDocument doc = QJsonDocument::fromJson(data);
     QJsonObject project_info = doc.object();
 
-    MainWindow *mw = new MainWindow(path, project_info, nullptr);
+    IDEWindow *mw = new IDEWindow(path, project_info, nullptr);
+    mw->setWindowState(Qt::WindowMaximized);
     mw->show();
     this->destroy();
 }
@@ -259,7 +260,7 @@ void WelcomeForm::L2CreateButton()
     project_file.write(doc_proj_info.toJson(QJsonDocument::Indented));
     project_file.close();
 
-    MainWindow *mw = new MainWindow(new_project_path, project_info, nullptr);
+    IDEWindow *mw = new IDEWindow(new_project_path, project_info, nullptr);
     mw->show();
     this->destroy();
 }

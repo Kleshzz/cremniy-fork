@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>styles/style.qss</file>
+        <file>icons/icon.png</file>
+        <file>icons/hex.png</file>
+        <file>icons/dasm.png</file>
+        <file>icons/code.png</file>
+        <file>icons/close.png</file>
+    </qresource>
+</RCC>

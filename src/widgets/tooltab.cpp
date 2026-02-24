@@ -1,21 +1,14 @@
 #include "tooltab.h"
-#include "codeeditor.h"
 #include "filetab.h"
-#include <QCodeEditor>
+#include <QCodeEditor.hpp>
 #include <QFile>
-#include <QSyntaxStyle>
+#include <QSyntaxStyle.hpp>
 
-#include <QCodeEditor>
-#include <QGLSLCompleter>
-#include <QLuaCompleter>
-#include <QPythonCompleter>
-#include <QSyntaxStyle>
-#include <QCXXHighlighter>
-#include <QGLSLHighlighter>
-#include <QXMLHighlighter>
-#include <QJSONHighlighter>
-#include <QLuaHighlighter>
-#include <QPythonHighlighter>
+#include <QCodeEditor.hpp>
+#include <QPythonCompleter.hpp>
+#include <QSyntaxStyle.hpp>
+#include <QCXXHighlighter.hpp>
+#include <QJSONHighlighter.hpp>
 #include <qboxlayout.h>
 #include <qfileinfo.h>
 
@@ -49,9 +42,9 @@ ToolTab::ToolTab(FileTab *fwparent, QString path) :
     QWidget *emptyWidget1 = new QWidget();
     QWidget *emptyWidget2 = new QWidget();
 
-    QIcon codeIcon(":/code.png");
-    QIcon hexIcon(":/hex.png");
-    QIcon disasmIcon(":/dasm.png");
+    QIcon codeIcon(":/icons/code.png");
+    QIcon hexIcon(":/icons/hex.png");
+    QIcon disasmIcon(":/icons/dasm.png");
 
     m_codeEditor = new QCodeEditor(this);
     m_codeEditor->setPlainText(text);

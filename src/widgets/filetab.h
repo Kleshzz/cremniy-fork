@@ -9,6 +9,7 @@ class FileTab : public QWidget
     Q_OBJECT
 public:
     QString filePath;
+    FilesTabWidget* parrentTabWidget;
     explicit FileTab(FilesTabWidget *fwparent, QString path);
     void saveFile();
 
