@@ -34,6 +34,8 @@ public:
     bool m_ignoreModification = false;
 
     void setBData(const QByteArray& data) override {
+        qDebug() << "QCodeEditor: setBData";
+
         m_ignoreModification = true;
 
         QString text = QString::fromUtf8(data);
@@ -42,9 +44,12 @@ public:
 
         m_ignoreModification = false;
     }
+
     QByteArray getBData() override {
+        qDebug() << "QCodeEditor: getBData";
         return this->toPlainText().toUtf8();
     }
+
     double scaleFactor = 1.0;
     void wheelEvent(QWheelEvent* e) override
     {

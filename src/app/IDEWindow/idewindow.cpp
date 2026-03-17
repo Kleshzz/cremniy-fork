@@ -27,6 +27,7 @@ IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     m_file_openProject = new QAction("New Project", this);
     m_file_newProject = new QAction("Open Project", this);
     m_file_saveFile = new QAction("Save File", this);
+    GlobalWidgetsManager::instance().set_IDEWindow_menuBar_file_saveFile(m_file_saveFile);
     m_file_closeProject = new QAction("Close Project", this);
 
     m_view_wordWrap = new QAction("Word Wrap", this);
@@ -138,7 +139,6 @@ IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     m_filesTabWidget->setTabsClosable(true);
     m_filesTabWidget->setMovable(true);
 
-    connect(m_file_saveFile, &QAction::triggered, this, &IDEWindow::onSaveFile);
     connect(m_file_closeProject, &QAction::triggered, this, &IDEWindow::onClosingProject);
 
     connect(m_filesTabWidget, &QTabWidget::tabCloseRequested,
@@ -154,17 +154,11 @@ IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     connect(m_filesTreeView, &QTreeView::customContextMenuRequested,
             this, &IDEWindow::onTreeContextMenu);
 
-    connect(m_view_wordWrap, &QAction::triggered, this, &IDEWindow::on_menuBar_actionView_wordWrap_clicked);
-
     connect(m_filesTreeView, &QTreeView::doubleClicked, this, &IDEWindow::on_treeView_doubleClicked);
 }
 
 IDEWindow::~IDEWindow()
 {}
-
-void IDEWindow::on_menuBar_actionView_wordWrap_clicked(){
-    qDebug() << "on_menuBar_actionView_wordWrap_clicked";
-}
 
 void IDEWindow::SaveProjectInCache(const QString project_path){
     QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -191,21 +185,12 @@ void IDEWindow::SaveProjectInCache(const QString project_path){
     history_file.close();
 }
 
-void IDEWindow::onSaveFile()
-{
-    m_filesTabWidget->saveCurrentFile();
-}
-
 void IDEWindow::onClosingProject() {
     WelcomeForm* wForm = new WelcomeForm();
     wForm->show();
 
     this->close();
     this->deleteLater();
-}
-
-void IDEWindow::closeEvent(QCloseEvent *event) {
-    onSaveFile();
 }
 
 void IDEWindow::on_treeView_doubleClicked(const QModelIndex &index)

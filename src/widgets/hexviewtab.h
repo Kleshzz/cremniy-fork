@@ -2,23 +2,25 @@
 #define HEXVIEWTAB_H
 
 #include "QHexView/qhexview.h"
+#include "filecontext.h"
 #include "tooltab.h"
 #include <QWidget>
 #include <qfileinfo.h>
 
-class HexViewTab : public QWidget, public ToolTab
+class HexViewTab : public ToolTab
 {
     Q_OBJECT
 
 private:
     QHexView* m_hexViewWidget;
     QWidget* createPage();
-    uint m_dataHash = 0;
+
+    void setTabData();
 
 public:
     explicit HexViewTab(QWidget *parent, QString path);
 
-    void saveToFile(QString path) override {
+    void saveTabData() override {
 
         QByteArray data = m_hexViewWidget->getBData();
         uint newDataHash = qHash(data, 0);

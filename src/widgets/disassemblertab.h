@@ -1,6 +1,7 @@
 #ifndef DISASSEMBLERTAB_H
 #define DISASSEMBLERTAB_H
 
+#include "filecontext.h"
 #include "tooltab.h"
 #include "disassemblerworker.h"
 #include <QWidget>
@@ -16,7 +17,7 @@ class QLineEdit;
 class QStackedWidget;
 class QSplitter;
 
-class DisassemblerTab : public QWidget, public ToolTab
+class DisassemblerTab : public ToolTab
 {
     Q_OBJECT
 
@@ -51,6 +52,7 @@ private:
     void appendLog(const QString &line);
 
     QString m_filePath;
+    FileContext fileContext;
 
     QThread            *m_thread  = nullptr;
     DisassemblerWorker *m_worker  = nullptr;

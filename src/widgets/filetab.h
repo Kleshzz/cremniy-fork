@@ -14,12 +14,8 @@ private:
 public:
     explicit FileTab(QWidget *parrent, QString path);
     QString filePath;
-    void saveFile();
-    void openFile(int index = -1, int excluded_index = -1);   
 
 public slots:
-    void giveData(int index);
-
     void removeStar();
     void setupStar();
 

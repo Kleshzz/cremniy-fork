@@ -5,11 +5,6 @@ FilesTabWidget::FilesTabWidget(QWidget *parent) {
     connect(this, &QTabWidget::currentChanged, this, &FilesTabWidget::tabSelect);
 }
 
-void FilesTabWidget::saveCurrentFile(){
-    FileTab *currentFileTab = qobject_cast<FileTab*>(this->currentWidget());
-    currentFileTab->saveFile();
-}
-
 void FilesTabWidget::tabSelect(int index){
     FileTab *tab = qobject_cast<FileTab*>(widget(index));
     if (!tab) return;
@@ -33,10 +28,8 @@ void FilesTabWidget::openFile(QString filePath, QString tabTitle){
     FileTab *filetab = new FileTab(this, filePath);
     int new_tab_index = this->addTab(filetab, tabTitle);
     this->setCurrentIndex(new_tab_index);
-    filetab->openFile();
 
-    // connects
-
+    // - - Connects - -
     connect(filetab, &FileTab::removeStarSignal, this, &FilesTabWidget::removeStar);
     connect(filetab, &FileTab::setupStarSignal, this, &FilesTabWidget::setupStar);
 }

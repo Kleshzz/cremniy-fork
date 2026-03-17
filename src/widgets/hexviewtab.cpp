@@ -9,6 +9,7 @@
 
 HexViewTab::HexViewTab(QWidget *parent, QString path)
     : QWidget{parent}
+    , fileContext(path)
 {
 
     // - - Tab Widgets - -

@@ -28,6 +28,7 @@ static constexpr int NUM_COLS     = 4;
 DisassemblerTab::DisassemblerTab(QWidget *parent, QString path)
     : QWidget{parent}
     , m_filePath(path)
+    , fileContext(path)
 {
     setupUi();
 

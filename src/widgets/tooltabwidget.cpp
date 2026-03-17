@@ -10,6 +10,7 @@
 #include <QJSONHighlighter.hpp>
 #include <qboxlayout.h>
 #include <qfileinfo.h>
+#include "globalwidgetsmanager.h"
 
 ToolTabWidget::ToolTabWidget(QWidget *parent, QString path)
     {
@@ -32,10 +33,13 @@ ToolTabWidget::ToolTabWidget(QWidget *parent, QString path)
 
     // - - Connects - -
 
+    // Trigger: Menu Bar: File->SaveFile or CTRL+S - saveTabData
+    connect(GlobalWidgetsManager::instance().get_IDEWindow_menuBar_file_saveFile(),
+            &QAction::triggered, this, &ToolTabWidget::saveCurrentTabData);
+
     // Code Editor Tab
     connect(m_codeEditorTab, &CodeEditorTab::modifyData, this, &ToolTabWidget::setupStar);
     connect(m_codeEditorTab, &CodeEditorTab::dataEqual, this, &ToolTabWidget::removeStar);
-    connect(m_codeEditorTab, &CodeEditorTab::askData, this, &ToolTabWidget::giveData); // when "Open Anyway" button clicked
     connect(m_codeEditorTab, &CodeEditorTab::setHexViewTab, this, &ToolTabWidget::setHexViewTab); // when "Open in HexView" button clicked
 
     // Hex View Tab
@@ -44,6 +48,11 @@ ToolTabWidget::ToolTabWidget(QWidget *parent, QString path)
 
     // Disassembler Tab
     connect(m_disassemblerTab, &DisassemblerTab::modifyData, this, &ToolTabWidget::setupStar);
+}
+
+void ToolTabWidget::saveCurrentTabData(){
+    ToolTab* tab = dynamic_cast<ToolTab*>(currentWidget());
+    if (tab) tab->saveTabData();
 }
 
 void ToolTabWidget::removeStar(){
@@ -98,58 +107,4 @@ void ToolTabWidget::setupStar(bool modified){
 void ToolTabWidget::setHexViewTab(){
     int index = indexOf(m_hexViewTab);
     setCurrentIndex(index);
-}
-
-void ToolTabWidget::giveData(){
-    QObject* s = sender();
-    int index = -1;
-    if (s == m_codeEditorTab)
-        index = this->indexOf(m_codeEditorTab);
-    else if (s == m_hexViewTab)
-        index = this->indexOf(m_hexViewTab);
-    else if (s == m_disassemblerTab)
-        index = this->indexOf(m_disassemblerTab);
-
-    if (index >= 0){
-        emit askData(index);
-    }
-}
-
-int ToolTabWidget::saveToFileCurrentTab(QString path){
-    QWidget* w = currentWidget();
-    int index = currentIndex();
-    if (!w) return -1;
-
-    ToolTab* tab = dynamic_cast<ToolTab*>(w);
-    if (!tab) return -1;
-
-    tab->saveToFile(path);
-    QString text = tabText(index);
-    text.replace("*", "");
-    setTabText(index, text);
-    return index;
-}
-
-void ToolTabWidget::setDataInTabs(QByteArray &data, int index, int excluded_index){
-    if (index >= 0){
-        QWidget* w = widget(index);
-        if (!w) return;
-
-        ToolTab* tab = dynamic_cast<ToolTab*>(w);
-        if (!tab) return;
-
-        tab->setTabData(data);
-    }
-    else{
-        for (int i = 0; i < count(); ++i) {
-            if (i == excluded_index) continue;
-            QWidget* w = widget(i);
-            if (!w) return;
-
-            ToolTab* tab = dynamic_cast<ToolTab*>(w);
-            if (!tab) return;
-
-            tab->setTabData(data);
-        }
-    }
 }

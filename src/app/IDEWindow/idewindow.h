@@ -24,10 +24,7 @@ private slots:
 
     void onTreeContextMenu(const QPoint &pos);
 
-    void onSaveFile();
     void onClosingProject();
-
-    void on_menuBar_actionView_wordWrap_clicked();
 
 private:
     QMenuBar* m_menuBar;
@@ -59,7 +56,5 @@ private:
     void SaveProjectInCache(const QString project_path);
     void openDirectory(const QString &path);
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
 };
 #endif // IDEWINDOW_H
