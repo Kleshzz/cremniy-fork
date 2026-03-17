@@ -25,6 +25,7 @@ private slots:
     void onTreeContextMenu(const QPoint &pos);
 
     void onSaveFile();
+    void onClosingProject();
 
     void on_menuBar_actionView_wordWrap_clicked();
 
@@ -35,12 +36,18 @@ private:
     QMenu* m_fileMenu;
     QMenu* m_editMenu;
     QMenu* m_viewMenu;
+    QMenu* m_gitMenu;
 
     QAction* m_file_newProject;
     QAction* m_file_openProject;
     QAction* m_file_saveFile;
+    QAction* m_file_closeProject;
 
     QAction* m_view_wordWrap;
+
+    QAction* m_git_commit;
+    QAction* m_git_commitAndPush;
+    QAction* m_git_setBranch;
 
     QWidget* m_mainWidget;
     QHBoxLayout* m_mainLayout;
@@ -51,5 +58,8 @@ private:
 
     void SaveProjectInCache(const QString project_path);
     void openDirectory(const QString &path);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 };
 #endif // IDEWINDOW_H

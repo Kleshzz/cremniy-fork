@@ -8,11 +8,11 @@
 #include <QStandardPaths>
 #include <QApplication>
 #include "globalwidgetsmanager.h"
+#include "app/WelcomeWindow/welcomeform.h"
 
 IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     : QMainWindow(parent)
 {
-
     this->setWindowState(Qt::WindowMaximized);
     this->setWindowTitle("Cremniy");
     SaveProjectInCache(ProjectPath);
@@ -22,15 +22,21 @@ IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     m_fileMenu = m_menuBar->addMenu("File");
     m_editMenu = m_menuBar->addMenu("Edit");
     m_viewMenu = m_menuBar->addMenu("View");
+    m_gitMenu = m_menuBar->addMenu("Git");
 
     m_file_openProject = new QAction("New Project", this);
     m_file_newProject = new QAction("Open Project", this);
     m_file_saveFile = new QAction("Save File", this);
+    m_file_closeProject = new QAction("Close Project", this);
 
     m_view_wordWrap = new QAction("Word Wrap", this);
     m_view_wordWrap->setCheckable(true);
     m_view_wordWrap->setChecked(true);
     GlobalWidgetsManager::instance().set_IDEWindow_menuBar_view_wordWrap(m_view_wordWrap);
+
+    m_git_commit = new QAction("Commit", this);
+    m_git_commitAndPush = new QAction("Commit And Push", this);
+    m_git_setBranch = new QAction("Set Branch", this);
 
     m_statusBar = statusBar();
 
@@ -77,8 +83,15 @@ IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     m_fileMenu->addAction(m_file_newProject);
     m_fileMenu->addSeparator();
     m_fileMenu->addAction(m_file_saveFile);
+    m_fileMenu->addSeparator();
+    m_fileMenu->addAction(m_file_closeProject);
 
     m_viewMenu->addAction(m_view_wordWrap);
+
+    m_gitMenu->addAction(m_git_commit);
+    m_gitMenu->addAction(m_git_commitAndPush);
+    m_gitMenu->addSeparator();
+    m_gitMenu->addAction(m_git_setBranch);
 
     setCentralWidget(m_mainWidget);
 
@@ -126,6 +139,7 @@ IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     m_filesTabWidget->setMovable(true);
 
     connect(m_file_saveFile, &QAction::triggered, this, &IDEWindow::onSaveFile);
+    connect(m_file_closeProject, &QAction::triggered, this, &IDEWindow::onClosingProject);
 
     connect(m_filesTabWidget, &QTabWidget::tabCloseRequested,
             this, [=](int index){
@@ -180,6 +194,18 @@ void IDEWindow::SaveProjectInCache(const QString project_path){
 void IDEWindow::onSaveFile()
 {
     m_filesTabWidget->saveCurrentFile();
+}
+
+void IDEWindow::onClosingProject() {
+    WelcomeForm* wForm = new WelcomeForm();
+    wForm->show();
+
+    this->close();
+    this->deleteLater();
+}
+
+void IDEWindow::closeEvent(QCloseEvent *event) {
+    onSaveFile();
 }
 
 void IDEWindow::on_treeView_doubleClicked(const QModelIndex &index)
