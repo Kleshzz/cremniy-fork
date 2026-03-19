@@ -10,7 +10,7 @@
 - дизассемблером (использует objdump)
 
 ## 🛠 Ближайшие задачи
-- [ ] [Добавить поддержку языков](https://github.com/igmunv/cremniy/issues/4)
+- [x] [Добавить поддержку языков](https://github.com/igmunv/cremniy/issues/4)
 - [ ] [Поиск строки в коде](https://github.com/igmunv/cremniy/issues/27)
 - [ ] [Основы базовой архитектуры для обеспечения расширяемости](https://github.com/igmunv/cremniy/issues/29)
 - [ ] [Сборка и запуск проекта пользователя](https://github.com/igmunv/cremniy/issues/6)
