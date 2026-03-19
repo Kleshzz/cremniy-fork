@@ -52,17 +52,38 @@ QCodeEditor::QCodeEditor(QString ext, QWidget* widget) :
 }
 
 void QCodeEditor::initLanguages(){
-    m_completers["c"] = new QCECompleter(":/languages/c.xml");
+    // C / C++
+    m_completers["c"]   = new QCECompleter(":/languages/c.xml");
+    m_completers["h"]   = new QCECompleter(":/languages/c.xml");
     m_completers["cpp"] = new QCECompleter(":/languages/cpp.xml");
-    m_completers["asm_intel"] = new QCECompleter(":/languages/asm_intel.xml");
-    m_completers["asm_att"] = new QCECompleter(":/languages/asm_att.xml");
-    m_completers["rs"] = new QCECompleter(":/languages/rust.xml");
+    m_completers["hpp"] = new QCECompleter(":/languages/cpp.xml");
 
-    m_highlighters["c"] = new QCXXHighlighter;
+    // Assembler (Intel / AT&T) — один словарь для .asm и .s
+    m_completers["asm"] = new QCECompleter(":/languages/asm.xml");
+    m_completers["s"]   = new QCECompleter(":/languages/asm.xml");
+
+    // Rust
+    m_completers["rs"]  = new QCECompleter(":/languages/rust.xml");
+
+    // Build / config
+    m_completers[""]        = new QCECompleter(":/languages/gnumake.xml"); // "Makefile" (no extension)
+    m_completers["mk"]      = new QCECompleter(":/languages/gnumake.xml");
+    m_completers["make"]    = new QCECompleter(":/languages/gnumake.xml");
+    m_completers["cmake"]   = new QCECompleter(":/languages/cmake.xml");
+    m_completers["txt"]     = new QCECompleter(":/languages/cmake.xml");    // CMakeLists.txt
+
+    m_highlighters["c"]   = new QCXXHighlighter;
+    m_highlighters["h"]   = new QCXXHighlighter;
     m_highlighters["cpp"] = new QCXXHighlighter;
-    m_highlighters["asm_intel"] = new QCXXHighlighter;
-    m_highlighters["asm_att"] = new QCXXHighlighter;
-    m_highlighters["rs"] = new QCXXHighlighter;
+    m_highlighters["hpp"] = new QCXXHighlighter;
+    m_highlighters["asm"] = new QCXXHighlighter;
+    m_highlighters["s"]   = new QCXXHighlighter;
+    m_highlighters["rs"]  = new QCXXHighlighter;
+    m_highlighters[""]    = new QCXXHighlighter;
+    m_highlighters["mk"]  = new QCXXHighlighter;
+    m_highlighters["make"]= new QCXXHighlighter;
+    m_highlighters["cmake"]= new QCXXHighlighter;
+    m_highlighters["txt"] = new QCXXHighlighter;
 
     m_styles["default"] = QSyntaxStyle::defaultStyle();
 }

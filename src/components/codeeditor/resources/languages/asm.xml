@@ -41,6 +41,7 @@
         <name>lea</name>
     </section>
     <section name="Register">
+        <!-- Intel-style -->
         <name>rax</name>
         <name>rbx</name>
         <name>rcx</name>
@@ -81,8 +82,50 @@
         <name>ch</name>
         <name>dl</name>
         <name>dh</name>
+        <!-- AT&T-style -->
+        <name>%rax</name>
+        <name>%rbx</name>
+        <name>%rcx</name>
+        <name>%rdx</name>
+        <name>%rsi</name>
+        <name>%rdi</name>
+        <name>%rbp</name>
+        <name>%rsp</name>
+        <name>%r8</name>
+        <name>%r9</name>
+        <name>%r10</name>
+        <name>%r11</name>
+        <name>%r12</name>
+        <name>%r13</name>
+        <name>%r14</name>
+        <name>%r15</name>
+        <name>%eax</name>
+        <name>%ebx</name>
+        <name>%ecx</name>
+        <name>%edx</name>
+        <name>%esi</name>
+        <name>%edi</name>
+        <name>%ebp</name>
+        <name>%esp</name>
+        <name>%ax</name>
+        <name>%bx</name>
+        <name>%cx</name>
+        <name>%dx</name>
+        <name>%si</name>
+        <name>%di</name>
+        <name>%bp</name>
+        <name>%sp</name>
+        <name>%al</name>
+        <name>%ah</name>
+        <name>%bl</name>
+        <name>%bh</name>
+        <name>%cl</name>
+        <name>%ch</name>
+        <name>%dl</name>
+        <name>%dh</name>
     </section>
     <section name="Directive">
+        <!-- Common / Intel-like -->
         <name>.data</name>
         <name>.bss</name>
         <name>.text</name>
@@ -95,6 +138,15 @@
         <name>dw</name>
         <name>dd</name>
         <name>dq</name>
+        <!-- AT&T / GAS-like -->
+        <name>.section</name>
+        <name>.globl</name>
+        <name>.extern</name>
+        <name>.align</name>
+        <name>.byte</name>
+        <name>.word</name>
+        <name>.long</name>
+        <name>.quad</name>
     </section>
 </root>
 
