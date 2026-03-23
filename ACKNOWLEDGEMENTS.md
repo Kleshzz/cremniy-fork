@@ -17,7 +17,6 @@ People who contributed their time and code to Cremniy.
 | Artem Romancuk | [@teenageswag](https://github.com/teenageswag) |
 | Nikita Ivin | [@Keqy](https://github.com/Keqy) |
 | Altro-O | [@Altro-O](https://github.com/Altro-O) |
-| Nikita Ivin | [@Keqy](https://github.com/Keqy) |
 | Kirill | [@KaVoshnik](https://github.com/KaVoshnik) |
 | Marcus | [@encryrose](https://github.com/encryrose) |
 ---
