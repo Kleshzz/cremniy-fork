@@ -17,6 +17,11 @@ private:
      * @brief Виджет редактора кода
     */
     QCodeEditor* m_codeEditorWidget;
+    QWidget* m_searchWidget;
+    class QLineEdit* m_searchLineEdit;
+    class QPushButton* m_findNextBtn;
+    class QPushButton* m_findPrevBtn;
+    class QPushButton* m_closeSearchBtn;
 
     /**
      * @brief Главный виджет страницы "Binary File Detected"
@@ -29,6 +34,12 @@ private:
      * Используется при нажатии пользователем на кнопку "Open Anyway" на странице "Binary File Detected"
     */
     bool forceSetData = false;
+
+    /**
+     * @brief Выполнить поиск
+     * @param backward Искать в обратном направлении (назад)
+     */
+    void performSearch(bool backward = false);
 
 public:
     explicit CodeEditorTab(QWidget *parent = nullptr);
@@ -51,6 +62,8 @@ public slots:
     void setFile(QString filepath) override;
     void setTabData() override;
     void saveTabData() override;
+    void showSearchBar();
+    void hideSearchBar();
 
 };
 
