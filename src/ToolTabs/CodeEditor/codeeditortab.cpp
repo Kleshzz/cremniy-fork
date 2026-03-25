@@ -351,6 +351,7 @@ void CodeEditorTab::performSearch(bool backward)
     // Обновляем виджет, чтобы Qt применил новые стили из QSS
     m_searchLineEdit->style()->unpolish(m_searchLineEdit);
     m_searchLineEdit->style()->polish(m_searchLineEdit);
+}
 
 QByteArray CodeEditorTab::editorDataWithBom() const
 {
