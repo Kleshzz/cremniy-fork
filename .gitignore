@@ -91,6 +91,8 @@ CMakeLists.txt.user*
 .ninja_deps
 .ninja_log
 .ninja_logs
+*.clangd
+*.clang-format
 
 build/
 CMakeFiles/
