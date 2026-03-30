@@ -40,6 +40,7 @@ private slots:
     void CreateProjectHandler();
     void L2BackButton();
     void L2CreateButton();
+
 };
 
 #endif // WELCOMEFORM_H

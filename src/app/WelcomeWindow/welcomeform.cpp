@@ -12,6 +12,7 @@
 #include <QJsonArray>
 #include <qstandardpaths.h>
 #include <qstringlistmodel.h>
+#include <qtimer.h>
 
 #include "projectshistorymanager.h"
 
@@ -101,10 +102,9 @@ WelcomeForm::WelcomeForm(QWidget *parent)
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     QPushButton *createButton = new QPushButton("Create");
     QPushButton *backButton = new QPushButton("Back");
-    // buttonLayout->addStretch(1);       // пустое пространство слева
+
     buttonLayout->addWidget(createButton);
     buttonLayout->addWidget(backButton);
-    // buttonLayout->addStretch(1);       // пустое пространство справа
 
     // Добавляем кнопки в основной вертикальный layout
     l2->addLayout(buttonLayout);
@@ -161,12 +161,18 @@ void WelcomeForm::OpenProject(QString path){
 
     utils::ProjectsHistoryManager::saveProjectsHistory(path);
 
+    this->hide();
+
     IDEWindow *mw = new IDEWindow(path, nullptr);
     mw->setAttribute(Qt::WA_DeleteOnClose);
     mw->setWindowState(Qt::WindowMaximized);
+
+    connect(mw, &IDEWindow::CloseProject, this, [this, mw]() {
+        this->show();
+    });
+
     mw->show();
 
-    this->close();
 }
 
 void WelcomeForm::CreateProjectHandler()

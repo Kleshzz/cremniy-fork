@@ -90,6 +90,7 @@ public slots:
 
 signals:
     void saveFileSignal();
+    void CloseProject();
 
 };
 #endif // IDEWINDOW_H

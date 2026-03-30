@@ -6,7 +6,6 @@
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <QApplication>
-#include "app/WelcomeWindow/welcomeform.h"
 #include "dialogs/settingsdialog.h"
 #include "ui/MenuBar/menubarbuilder.h"
 
@@ -118,10 +117,7 @@ void IDEWindow::on_Toggle_Terminal(bool checked) {
 }
 
 void IDEWindow::on_ClosingProject() {
-    WelcomeForm* wForm = new WelcomeForm();
-    wForm->setAttribute(Qt::WA_DeleteOnClose);
-    wForm->show();
-
+    emit CloseProject();
     this->close();
 }
 
@@ -138,7 +134,7 @@ void IDEWindow::on_treeView_doubleClicked(const QModelIndex &index)
 
 void IDEWindow::on_Tree_ContextMenu(const QPoint &pos)
 {
-    QModelIndex index = m_filesTreeView->indexAt(pos); // индекс под курсором
+    QModelIndex index = m_filesTreeView->indexAt(pos);
 
     QFileSystemModel *model = qobject_cast<QFileSystemModel*>(m_filesTreeView->model());
     if (!model)
@@ -150,7 +146,7 @@ void IDEWindow::on_Tree_ContextMenu(const QPoint &pos)
 
         QString path = model->filePath(index);
         QString fileName = model->fileName(index);
-        bool isDir = model->isDir(index);  // <-- проверяем, директория ли
+        bool isDir = model->isDir(index);
 
         if (isDir){
             menu.addAction("Open", [this, path]() {
@@ -162,13 +158,7 @@ void IDEWindow::on_Tree_ContextMenu(const QPoint &pos)
                 if (!index.isValid())
                     return;
 
-                // Разворачиваем саму директорию
                 m_filesTreeView->expand(index);
-
-                // Прокручиваем и выделяем
-                //m_filesTreeView->scrollTo(index);
-                //m_filesTreeView->setCurrentIndex(index);
-                //m_filesTreeView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 
             });
 
@@ -214,7 +204,6 @@ void IDEWindow::on_Tree_ContextMenu(const QPoint &pos)
                 if (!index.isValid())
                     return;
 
-                // Включаем редактирование индекса
                 m_filesTreeView->edit(index);
             });
             menu.addAction("Delete", [path,this]() {
@@ -223,9 +212,6 @@ void IDEWindow::on_Tree_ContextMenu(const QPoint &pos)
                 if (res == QMessageBox::Ok) QFile(path).remove();
             });
         }
-
-        // Показать меню в глобальных координатах
-
     }
 
     else{
