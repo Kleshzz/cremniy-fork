@@ -8,8 +8,6 @@
 #include <qmenubar.h>
 #include <qsplitter.h>
 #include <qstatusbar.h>
-#include <QLabel>
-#include <QTimer>
 #include "widgets/terminal/terminalwidget.h"
 
 class IDEWindow : public QMainWindow
@@ -43,8 +41,6 @@ private:
      * @brief Сохранить текущий путь проекта в истории
     */
     void SaveProjectInCache(const QString project_path);
-    void setupPerfMonitor();
-    void updatePerfMonitor();
 
     // - - Main Widgets - -
     QMenuBar* m_menuBar;
@@ -60,8 +56,6 @@ private:
 
     // - - Terminal Widget - -
     TerminalWidget* m_terminal;
-    QLabel* m_perfLabel = nullptr;
-    QTimer* m_perfTimer = nullptr;
 
 
 public slots:
@@ -112,12 +106,6 @@ public slots:
      * @brief Изменение визуальной ширины tab в редакторах кода
      */
     void on_SetTabWidth(int width);
-
-    /**
-     * @brief Включение/отключение панели метрик производительности
-     */
-    void on_Toggle_PerfMonitor(bool checked);
-
 
 signals:
     void saveFileSignal();
