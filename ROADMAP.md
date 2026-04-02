@@ -25,6 +25,7 @@
 - [ ] [Оптимизировать хранение данных у QHexView](https://github.com/Cremniy-Project/cremniy/issues/57)
 - [ ] [Улучшение дизайна Disassembler](https://github.com/Cremniy-Project/cremniy/issues/55)
 - [ ] [Добавить многоязычность](https://github.com/Cremniy-Project/cremniy/issues/67)
+- [ ] [Справочник по скан-кодам клавиш](https://github.com/munirov/cremniy/issues/89)
 - [ ] [Основы базовой архитектуры для обеспечения расширяемости](https://github.com/Cremniy-Project/cremniy/issues/29)
 - [ ] [Сборка и запуск проекта пользователя](https://github.com/Cremniy-Project/cremniy/issues/6)
 - [ ] [Использование иконок Breeze для файлов в QTreeView](https://github.com/Cremniy-Project/cremniy/issues/72)
