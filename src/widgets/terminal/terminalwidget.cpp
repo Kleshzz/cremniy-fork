@@ -223,9 +223,14 @@ void TerminalWidget::onProcessError(QProcess::ProcessError error) {
 
 TerminalWidget::~TerminalWidget() {
     saveHistory();
+
+    if (m_process) {
+        // Prevent QProcess from delivering signals into a partially destroyed widget.
+        disconnect(m_process, nullptr, this, nullptr);
+    }
     
-    if (m_process->state() != QProcess::NotRunning) {
+    if (m_process && m_process->state() != QProcess::NotRunning) {
         m_process->kill();
-        m_process->setParent(nullptr);
+        m_process->waitForFinished(500);
     }
 }
