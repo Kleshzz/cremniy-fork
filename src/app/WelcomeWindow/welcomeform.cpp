@@ -48,15 +48,17 @@ WelcomeForm::WelcomeForm(QWidget *parent)
     btnLayout->addWidget(open_recent_proj_btn);
     open_recent_proj_btn->setEnabled(false);
 
-    remove_recent_proj_btn = new QPushButton("Remove", pageWelcome);
-    btnLayout->addWidget(remove_recent_proj_btn);
-    remove_recent_proj_btn->setEnabled(false);
-
     QPushButton *open_browse_proj_btn = new QPushButton("Open...", pageWelcome);
     btnLayout->addWidget(open_browse_proj_btn);
 
     QPushButton *create_proj_btn = new QPushButton("Create", pageWelcome);
     btnLayout->addWidget(create_proj_btn);
+
+    remove_recent_proj_btn = new QPushButton("×", pageWelcome);
+    remove_recent_proj_btn->setFixedWidth(28);
+    remove_recent_proj_btn->setStyleSheet("QPushButton { padding: 5px 0px; }");
+    btnLayout->addWidget(remove_recent_proj_btn);
+    remove_recent_proj_btn->setEnabled(false);
 
     l1->addLayout(btnLayout);
 
