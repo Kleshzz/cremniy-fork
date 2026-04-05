@@ -72,7 +72,7 @@ void AsciiCharsRef::initWidgets(){
 
     layout->addWidget(table);
 
-    QHBoxLayout* lineEditLayout = new QHBoxLayout(this);
+    QHBoxLayout* lineEditLayout = new QHBoxLayout();
     layout->addLayout(lineEditLayout);
 
     QLineEdit* symbolInput = new QLineEdit(this);

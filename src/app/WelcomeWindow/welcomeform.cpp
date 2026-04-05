@@ -27,7 +27,6 @@ WelcomeForm::WelcomeForm(QWidget *parent)
 
     // Base
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    this->setLayout(mainLayout);
 
     stack = new QStackedWidget(this);
     mainLayout->addWidget(stack);
@@ -168,6 +167,10 @@ void WelcomeForm::OpenProject(QString path){
     mw->setWindowState(Qt::WindowMaximized);
 
     connect(mw, &IDEWindow::CloseProject, this, [this, mw]() {
+        RecentProjectsList->clearSelection();
+        open_recent_proj_btn->setEnabled(false);
+        open_recent_proj_btn->setProperty("state", "");
+        open_recent_proj_btn->style()->polish(open_recent_proj_btn);
         this->show();
     });
 
