@@ -1,3 +1,4 @@
+// ===== reversecalculatordialog.cpp =====
 // SPDX-License-Identifier: MIT
 #include "reversecalculatordialog.h"
 
@@ -10,6 +11,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
@@ -31,16 +33,46 @@ static QString fmtBin(qulonglong v, int bits)
     return s;
 }
 
-ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget *parent)
+// detect the "dominant" base of a token string for result formatting
+static int detectBase(const QString& token)
+{
+    const QString t = token.trimmed();
+    if (t.startsWith("0x", Qt::CaseInsensitive) || t.startsWith("+0x", Qt::CaseInsensitive) || t.startsWith("-0x", Qt::CaseInsensitive))
+        return 16;
+    if (t.startsWith("0b", Qt::CaseInsensitive) || t.startsWith("+0b", Qt::CaseInsensitive) || t.startsWith("-0b", Qt::CaseInsensitive))
+        return 2;
+    return 10;
+}
+
+static QString fmtResult(qulonglong v, int bits, int base)
+{
+    const qulonglong masked = v & (bits >= 64 ? ~0ULL : ((1ULL << bits) - 1ULL));
+    switch (base) {
+    case 16: return fmtHex(masked, bits);
+    case 2:  return fmtBin(masked, bits);
+    default: {
+        if (bits >= 64)
+            return QString::number(static_cast<qlonglong>(masked));
+        const qulonglong signBit = 1ULL << (bits - 1);
+        if (masked & signBit) {
+            const qulonglong mask = (1ULL << bits) - 1ULL;
+            return QString::number(-static_cast<qlonglong>((~masked + 1ULL) & mask));
+        }
+        return QString::number(masked);
+    }
+    }
+}
+
+ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget* parent)
     : QDialog(parent)
 {
     setWindowTitle(tr("Reverse Calculator"));
     setModal(false);
-    setMinimumWidth(560);
+    setMinimumWidth(620);
 
-    auto *root = new QVBoxLayout(this);
+    auto* root = new QVBoxLayout(this);
 
-    auto *topRow = new QHBoxLayout();
+    auto* topRow = new QHBoxLayout();
     m_input = new QLineEdit(this);
     m_input->setPlaceholderText(tr("Enter value: 1234, -1, 0xDEADBEEF, 0b1010"));
     topRow->addWidget(m_input, 1);
@@ -52,7 +84,6 @@ ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget *parent)
     m_width->addItem("64", 64);
     m_width->setCurrentIndex(2);
     m_width->setMinimumWidth(64);
-    // Ensure items are visible in dark themes.
     m_width->setStyleSheet(
         "QComboBox { background:#1a1a1a; color:#60a5fa; border:1px solid #262626; padding:2px 6px; }"
         "QComboBox::drop-down { border: none; width: 18px; }"
@@ -71,6 +102,27 @@ ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget *parent)
 
     root->addLayout(topRow);
 
+    m_historyList = new QListWidget(this);
+    m_historyList->setMaximumHeight(80);
+    m_historyList->hide();
+    m_historyList->setStyleSheet(
+        "QListWidget { background:#1a1a1a; color:#60a5fa; border:1px solid #262626; padding:2px; }"
+        "QListWidget::item:selected { background:#2d2d50; color:#ffffff; }"
+    );
+
+    m_clearHistoryBtn = new QPushButton(tr("Clear"), this);
+    m_clearHistoryBtn->hide();
+
+    auto* historyLayout = new QHBoxLayout();
+    historyLayout->addWidget(m_historyList, 1);
+
+    auto* clearLayout = new QVBoxLayout();
+    clearLayout->addWidget(m_clearHistoryBtn);
+    clearLayout->addStretch(1);
+    historyLayout->addLayout(clearLayout);
+
+    root->addLayout(historyLayout);
+
     m_status = new QLabel(this);
     m_status->setStyleSheet("color: #ef4444;");
     root->addWidget(m_status);
@@ -78,19 +130,20 @@ ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget *parent)
     m_form = new QFormLayout();
     m_form->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-    m_hex  = new QLabel("-", this);
+    m_hex = new QLabel("-", this);
     m_decU = new QLabel("-", this);
     m_decS = new QLabel("-", this);
-    m_bin  = new QLabel("-", this);
+    m_bin = new QLabel("-", this);
 
-    for (QLabel *l : {m_hex, m_decU, m_decS, m_bin}) {
+    auto applyLabelStyle = [](QLabel* l, const QString& color) {
         l->setTextInteractionFlags(Qt::TextSelectableByMouse);
-        l->setStyleSheet("color: #60a5fa;"); // blue, no gray/black
-    }
-    m_hex->setStyleSheet("color: #21c55d;");  // green
-    m_decU->setStyleSheet("color: #60a5fa;"); // blue
-    m_decS->setStyleSheet("color: #ef4444;"); // red
-    m_bin->setStyleSheet("color: #21c55d;");  // green
+        l->setStyleSheet(QString("color: %1;").arg(color));
+        };
+
+    applyLabelStyle(m_hex, "#21c55d");
+    applyLabelStyle(m_decU, "#60a5fa");
+    applyLabelStyle(m_decS, "#ef4444");
+    applyLabelStyle(m_bin, "#21c55d");
 
     m_form->addRow(tr("Hex"), m_hex);
     m_form->addRow(tr("Dec (unsigned)"), m_decU);
@@ -98,8 +151,9 @@ ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget *parent)
     m_form->addRow(tr("Bin"), m_bin);
     root->addLayout(m_form);
 
-    auto *btnRow = new QHBoxLayout();
+    auto* btnRow = new QHBoxLayout();
     m_swapBtn = new QPushButton(tr("Swap endian"), this);
+    m_swapBtn->setToolTip(tr("Swap byte order within selected bit width"));
     btnRow->addWidget(m_swapBtn);
     btnRow->addStretch(1);
 
@@ -112,12 +166,19 @@ ReverseCalculatorDialog::ReverseCalculatorDialog(QWidget *parent)
     root->addLayout(btnRow);
 
     connect(m_input, &QLineEdit::textChanged, this, &ReverseCalculatorDialog::onInputChanged);
+    connect(m_input, &QLineEdit::returnPressed, this, &ReverseCalculatorDialog::onReturnPressed);
     connect(m_width, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ReverseCalculatorDialog::onInputChanged);
     connect(m_showSigned, &QCheckBox::toggled, this, &ReverseCalculatorDialog::onInputChanged);
     connect(m_swapBtn, &QPushButton::clicked, this, &ReverseCalculatorDialog::onSwapEndian);
     connect(m_copyHex, &QPushButton::clicked, this, &ReverseCalculatorDialog::onCopyHex);
     connect(m_copyDec, &QPushButton::clicked, this, &ReverseCalculatorDialog::onCopyDec);
     connect(m_copyBin, &QPushButton::clicked, this, &ReverseCalculatorDialog::onCopyBin);
+    connect(m_historyList, &QListWidget::itemClicked, this, &ReverseCalculatorDialog::onHistoryItemClicked);
+    connect(m_clearHistoryBtn, &QPushButton::clicked, this, [this]() {
+        m_historyList->clear();
+        m_historyList->hide();
+        m_clearHistoryBtn->hide();
+        });
 
     onInputChanged();
 }
@@ -136,7 +197,6 @@ qlonglong ReverseCalculatorDialog::toSigned(qulonglong v, int bits)
     const qulonglong mask = (1ULL << bits) - 1ULL;
     v &= mask;
     if ((v & signBit) == 0) return static_cast<qlonglong>(v);
-    // two's complement
     const qulonglong neg = (~v + 1ULL) & mask;
     return -static_cast<qlonglong>(neg);
 }
@@ -151,90 +211,244 @@ qulonglong ReverseCalculatorDialog::swapEndian(qulonglong v, int bits)
     return maskToWidth(out, bits);
 }
 
-bool ReverseCalculatorDialog::parseValue(const QString &text, qulonglong *outValue)
+bool ReverseCalculatorDialog::parseValue(const QString& text, qulonglong* outValue)
 {
     if (!outValue) return false;
     const QString t = text.trimmed();
     if (t.isEmpty()) return false;
 
-    // Accept: -123, 123, 0x..., 0b...
-    static const QRegularExpression re(
-        R"(^\s*([+-]?)\s*(0x[0-9a-fA-F]+|0b[01]+|\d+)\s*$)");
+    // strip spaces from binary literals with spaces
+    {
+        // explicit 0b prefix with embedded spaces
+        static const QRegularExpression binPrefixed(R"(^\s*([+-]?)\s*(0[bB][01 ]+)\s*$)");
+        auto bm = binPrefixed.match(t);
+        if (bm.hasMatch()) {
+            QString digits = bm.captured(2).mid(2);
+            digits.remove(' ');
+            if (digits.isEmpty()) return false;
+            bool ok = false;
+            qulonglong v = digits.toULongLong(&ok, 2);
+            if (!ok) return false;
+            const QString sign = bm.captured(1);
+            *outValue = (sign == "-") ? static_cast<qulonglong>(-static_cast<qlonglong>(v)) : v;
+            return true;
+        }
+
+        // raw binary digits with spaces
+        static const QRegularExpression rawBin(R"(^\s*([+-]?)\s*([01][01 ]+[01])\s*$)");
+        auto rm = rawBin.match(t);
+        if (rm.hasMatch()) {
+            QString digits = rm.captured(2);
+            digits.remove(' ');
+            bool ok = false;
+            qulonglong v = digits.toULongLong(&ok, 2);
+            if (!ok) return false;
+            const QString sign = rm.captured(1);
+            *outValue = (sign == "-") ? static_cast<qulonglong>(-static_cast<qlonglong>(v)) : v;
+            return true;
+        }
+    }
+
+    static const QRegularExpression re(R"(^\s*([+-]?)\s*(0x[0-9a-fA-F]+|0b[01]+|\d+)\s*$)");
     auto m = re.match(t);
     if (!m.hasMatch()) return false;
 
     const QString sign = m.captured(1);
-    const QString num  = m.captured(2);
+    const QString num = m.captured(2);
 
     bool ok = false;
     qulonglong v = 0;
     if (num.startsWith("0x", Qt::CaseInsensitive)) {
         v = num.mid(2).toULongLong(&ok, 16);
-    } else if (num.startsWith("0b", Qt::CaseInsensitive)) {
+    }
+    else if (num.startsWith("0b", Qt::CaseInsensitive)) {
         v = num.mid(2).toULongLong(&ok, 2);
-    } else {
+    }
+    else {
         v = num.toULongLong(&ok, 10);
     }
     if (!ok) return false;
 
-    if (sign == "-") {
-        // Keep as 64-bit two's complement; width masking applied later.
-        *outValue = static_cast<qulonglong>(-static_cast<qlonglong>(v));
-    } else {
-        *outValue = v;
-    }
+    *outValue = (sign == "-") ? static_cast<qulonglong>(-static_cast<qlonglong>(v)) : v;
     return true;
 }
 
-void ReverseCalculatorDialog::updateOutputs(qulonglong value, bool ok) {
-  const int bits = m_width->currentData().toInt();
+bool ReverseCalculatorDialog::parseExpression(const QString& text, qulonglong* outValue,
+    QString* errorOut, int* lhsBase)
+{
+    if (!outValue || !errorOut) return false;
 
-  if (!ok) {
-    m_status->setText(tr("Invalid input"));
-    m_hex->setText("-");
-    m_decU->setText("-");
-    m_decS->setText("-");
-    m_bin->setText("-");
-    return;
-  }
+    // split on operator, allowing spaces in binary literals
+    static const QRegularExpression exprRe(
+        R"(^\s*((?:[+-]?\s*)?(?:0[xX][0-9a-fA-F]+|0[bB][01 ]+|[01][01 ]+[01]|\d+))\s*(\+|-|\*|/|%|&|\||\^|<<|>>)\s*((?:[+-]?\s*)?(?:0[xX][0-9a-fA-F]+|0[bB][01 ]+|[01][01 ]+[01]|\d+))\s*$)"
+    );
+    auto m = exprRe.match(text);
+    if (!m.hasMatch()) {
+        *errorOut = tr("Invalid expression");
+        return false;
+    }
 
-  m_status->clear();
+    const QString lhsStr = m.captured(1).trimmed();
+    const QString op = m.captured(2);
+    const QString rhsStr = m.captured(3).trimmed();
 
-  const qulonglong v = maskToWidth(value, bits);
+    if (lhsBase)
+        *lhsBase = detectBase(lhsStr);
 
-  m_hex->setText(fmtHex(v, bits));
-  m_decU->setText(QString::number(v));
-  m_decS->setText(QString::number(toSigned(v, bits)));
-  m_bin->setText(fmtBin(v, bits));
+    qulonglong lhs = 0, rhs = 0;
+    if (!parseValue(lhsStr, &lhs) || !parseValue(rhsStr, &rhs)) {
+        *errorOut = tr("Invalid operands");
+        return false;
+    }
+
+    if (op == "+")       *outValue = lhs + rhs;
+    else if (op == "-")  *outValue = lhs - rhs;
+    else if (op == "*")  *outValue = lhs * rhs;
+    else if (op == "/") {
+        if (rhs == 0) { *errorOut = tr("Division by zero"); return false; }
+        *outValue = lhs / rhs;
+    }
+    else if (op == "%") {
+        if (rhs == 0) { *errorOut = tr("Modulo by zero"); return false; }
+        *outValue = lhs % rhs;
+    }
+    else if (op == "&")  *outValue = lhs & rhs;
+    else if (op == "|")  *outValue = lhs | rhs;
+    else if (op == "^")  *outValue = lhs ^ rhs;
+    else if (op == "<<") *outValue = lhs << rhs;
+    else if (op == ">>") *outValue = lhs >> rhs;
+    else { *errorOut = tr("Unknown operator"); return false; }
+
+    return true;
 }
 
-void ReverseCalculatorDialog::onInputChanged() {
-  qulonglong v = 0;
-  const bool isInputEmpty = m_input->text().trimmed().isEmpty();
-  const bool ok = parseValue(m_input->text(), &v);
-  
-  if (isInputEmpty) {
-    m_status->clear();
-    m_hex->setText("-");
-    m_decU->setText("-");
-    m_decS->setText("-");
-    m_bin->setText("-");
-  } else {
-    updateOutputs(v, ok); 
-  }
+void ReverseCalculatorDialog::updateOutputs(qulonglong value, bool ok)
+{
+    const int bits = m_width->currentData().toInt();
 
-  if (m_showSigned->isChecked()) {
-    m_form->setRowVisible(m_decS, true);
-    m_decS->setVisible(true);
-    if (QWidget *label = m_form->labelForField(m_decS)) {
-      label->show();
+    if (!ok) {
+        m_hex->setText("-");
+        m_decU->setText("-");
+        m_decS->setText("-");
+        m_bin->setText("-");
+        return;
     }
-  } else {
-    m_form->setRowVisible(m_decS, false);
-    if (QWidget *label = m_form->labelForField(m_decS)) {
-      label->hide();
+
+    const qulonglong v = maskToWidth(value, bits);
+
+    m_hex->setText(fmtHex(v, bits));
+    m_decU->setText(QString::number(v));
+    m_decS->setText(QString::number(toSigned(v, bits)));
+    m_bin->setText(fmtBin(v, bits));
+}
+
+static bool looksLikeExpression(const QString& text)
+{
+    // After the first numeric token, is there an operator?
+    static const QRegularExpression firstTokenRe(R"(^\s*(?:[+-]?\s*)?(?:0[xX][0-9a-fA-F]+|0[bB][01 ]+|[01][01 ]+[01]|\d+)\s*(\+|-|\*|/|%|&|\||\^|<<|>>))");
+    return firstTokenRe.match(text).hasMatch();
+}
+
+void ReverseCalculatorDialog::onInputChanged()
+{
+    const QString text = m_input->text().trimmed();
+
+    if (text.isEmpty()) {
+        m_status->clear();
+        m_hex->setText("-");
+        m_decU->setText("-");
+        m_decS->setText("-");
+        m_bin->setText("-");
+        updateSignedRowVisibility();
+        return;
     }
-  }
+
+    qulonglong v = 0;
+    QString error;
+    bool ok = false;
+
+    if (looksLikeExpression(text)) {
+        int lhsBase = 10;
+        ok = parseExpression(text, &v, &error, &lhsBase);
+        if (!ok) {
+            m_status->setText(error);
+            m_status->setStyleSheet("color: #ef4444;");
+        }
+        else {
+            const int bits = m_width->currentData().toInt();
+            const QString res = fmtResult(v, bits, lhsBase);
+            m_status->setText(QString("%1 = %2").arg(text.simplified()).arg(res));
+            m_status->setStyleSheet("color: #21c55d;");
+        }
+    }
+    else {
+        ok = parseValue(text, &v);
+        if (!ok) {
+            m_status->setText(tr("Invalid input"));
+            m_status->setStyleSheet("color: #ef4444;");
+        }
+        else {
+            m_status->clear();
+        }
+    }
+
+    updateOutputs(v, ok);
+    updateSignedRowVisibility();
+}
+
+void ReverseCalculatorDialog::onReturnPressed()
+{
+    const QString text = m_input->text().trimmed();
+    if (text.isEmpty()) return;
+
+    qulonglong v = 0;
+    QString error;
+    bool ok = false;
+    int lhsBase = 10;
+
+    if (looksLikeExpression(text)) {
+        ok = parseExpression(text, &v, &error, &lhsBase);
+    }
+    else {
+        ok = parseValue(text, &v);
+        lhsBase = detectBase(text);
+    }
+
+    if (ok) {
+        const int bits = m_width->currentData().toInt();
+        const QString res = fmtResult(v, bits, lhsBase);
+        const QString historyItem = QString("%1 = %2").arg(text.simplified()).arg(res);
+
+        if (m_historyList->count() > 0 &&
+            m_historyList->item(m_historyList->count() - 1)->text() == historyItem)
+            return;
+
+        m_historyList->addItem(historyItem);
+        while (m_historyList->count() > 10)
+            delete m_historyList->takeItem(0);
+
+        m_historyList->show();
+        m_clearHistoryBtn->show();
+        m_historyList->scrollToBottom();
+    }
+}
+
+void ReverseCalculatorDialog::updateSignedRowVisibility()
+{
+    const bool show = m_showSigned->isChecked();
+    m_form->setRowVisible(m_decS, show);
+    if (QWidget* label = m_form->labelForField(m_decS))
+        show ? label->show() : label->hide();
+}
+
+void ReverseCalculatorDialog::onHistoryItemClicked(QListWidgetItem* item)
+{
+    if (!item) return;
+    QString text = item->text();
+    const int eqIdx = text.indexOf(" = ");
+    if (eqIdx != -1)
+        text = text.left(eqIdx);
+    m_input->setText(text);
 }
 
 void ReverseCalculatorDialog::onSwapEndian()
@@ -260,4 +474,3 @@ void ReverseCalculatorDialog::onCopyBin()
 {
     QGuiApplication::clipboard()->setText(m_bin->text());
 }
-
