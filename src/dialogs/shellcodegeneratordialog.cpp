@@ -17,6 +17,7 @@
 #include <QFontDatabase>
 #include <QStandardPaths>
 #include <QRegularExpression>
+#include <QApplication>
 
 struct ArchEntry { const char* label; const char* bits; };
 static const ArchEntry kArchEntries[] = {
@@ -271,7 +272,7 @@ ShellcodeGeneratorDialog::disassemble(const QByteArray& raw, const QString& bits
         if (rawBytes.isEmpty()) continue;
 
         const QString mnemonic = parts.mid(2).join(' ').toLower();
-        result.append({ offset, rawBytes.size(), mnemonic });
+        result.append({ offset, static_cast<int>(rawBytes.size()), mnemonic });
     }
     return result;
 }
@@ -364,4 +365,8 @@ void ShellcodeGeneratorDialog::setStatus(const QString& msg, bool error)
 {
     m_statusLabel->setText(msg);
     m_statusLabel->setStyleSheet(error ? "color: #dc3545; font-size: 11px;" : "color: gray; font-size: 11px;");
+
+    if (error) {
+        QApplication::beep();
+    }
 }
