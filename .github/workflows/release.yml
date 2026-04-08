@@ -19,11 +19,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            artifact_name: cremniy-linux
+            artifact_name: cremniy-linux-${{ github.ref_name }}
           - os: windows-latest
-            artifact_name: cremniy-windows
+            artifact_name: cremniy-windows-${{ github.ref_name }}
           - os: macos-latest
-            artifact_name: cremniy-macos
+            artifact_name: cremniy-macos-${{ github.ref_name }}
 
     steps:
       - name: Checkout code
@@ -54,14 +54,6 @@ jobs:
 
       - name: Build
         run: cmake --build build --config Release --parallel
-
-      - name: Package (Linux) - tar.gz
-        if: runner.os == 'Linux'
-        run: |
-          mkdir -p package
-          cp build/cremniy package/ || cp build/Release/cremniy package/
-          cd package
-          tar -czf ../${{ matrix.artifact_name }}.tar.gz *
 
       - name: Package (Linux) - AppImage
         if: runner.os == 'Linux'
