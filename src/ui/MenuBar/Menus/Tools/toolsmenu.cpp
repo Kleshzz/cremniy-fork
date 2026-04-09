@@ -1,10 +1,10 @@
 #include "toolsmenu.h"
-#include "core/ToolTabFactory.h"
-#include "dialogs/reversecalculator/reversecalculatordialog.h"
-#include "dialogs/dataconverterdialog.h"
-#include "dialogs/shellcodegeneratordialog.h"
+#include "Tools/Windows/ReverseCalculator/reversecalculatordialog.h"
+#include "Tools/Windows/DataConverter/dataconverterdialog.h"
+#include "Tools/Windows/ShellCodeGenerator/shellcodegeneratordialog.h"
 
 #include "ui/MenuBar/menufactory.h"
+#include "ui/ToolsTabWidget/ToolTabFactory.h"
 #include <QKeySequence>
 #include <QAction>
 

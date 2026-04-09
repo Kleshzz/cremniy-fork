@@ -1,7 +1,7 @@
 #ifndef FILETAB_H
 #define FILETAB_H
 
-#include "toolstabwidget.h"
+#include "ui/ToolsTabWidget/toolstabwidget.h"
 #include <QWidget>
 
 class FileTab : public QWidget

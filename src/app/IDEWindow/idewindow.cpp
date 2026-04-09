@@ -1,5 +1,6 @@
 #include "idewindow.h"
 #include "dialogs/filecreatedialog.h"
+#include "libs/CodeEditor/include/widgets/CustomCodeEditor.h"
 #include "widgets/filetab.h"
 #include "QFileSystemModel"
 #include "QMessageBox"
@@ -9,7 +10,6 @@
 #include <QApplication>
 #include "dialogs/settingsdialog.h"
 #include "ui/MenuBar/menubarbuilder.h"
-#include "widgets/CustomCodeEditor.h"
 
 IDEWindow::IDEWindow(QString ProjectPath, QWidget *parent)
     : QMainWindow(parent), m_projectPath(ProjectPath)
