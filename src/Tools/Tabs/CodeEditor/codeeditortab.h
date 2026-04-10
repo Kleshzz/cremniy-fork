@@ -89,6 +89,10 @@ public slots:
     void setTabData() override;
     void saveTabData() override;
 
+    void setWordWrapSlot(bool checked) override;
+    void setTabReplaceSlot(bool checked) override;
+    void setTabWidthSlot(int width) override;
+
 };
 
 #endif // CODEEDITORTAB_H

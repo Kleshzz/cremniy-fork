@@ -320,3 +320,18 @@ void CodeEditorTab::saveTabData()
     emit dataEqual();
     emit refreshDataAllTabsSignal();
 }
+
+void CodeEditorTab::setWordWrapSlot(bool checked) {
+    m_codeEditorWidget->setWordWrapEnabled(checked);
+}
+
+void CodeEditorTab::setTabReplaceSlot(bool checked) {
+    m_codeEditorWidget->setTabReplace(checked);
+}
+
+void CodeEditorTab::setTabWidthSlot(int width) {
+    m_codeEditorWidget->setTabDisplaySize(width);
+    m_codeEditorWidget->setTabReplaceSize(width);
+}
+
+

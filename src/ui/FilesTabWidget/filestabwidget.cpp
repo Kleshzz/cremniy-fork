@@ -48,6 +48,11 @@ void FilesTabWidget::openFile(QString filePath, QString tabTitle) {
     connect(filetab, &FileTab::removeStarSignal, this, &FilesTabWidget::removeStar);
     connect(filetab, &FileTab::setupStarSignal, this, &FilesTabWidget::setupStar);
     connect(filetab, &FileTab::pinnedChanged, this, &FilesTabWidget::updatePinnedState);
+
+    connect(this, &FilesTabWidget::setWordWrapSignal, filetab, &FileTab::setWordWrapSlot);
+    connect(this, &FilesTabWidget::setTabReplaceSignal, filetab, &FileTab::setTabReplaceSlot);
+    connect(this, &FilesTabWidget::setTabWidthSignal, filetab, &FileTab::setTabWidthSlot);
+
 }
 
 void FilesTabWidget::removeStar(FileTab *tab) {
@@ -274,4 +279,16 @@ int FilesTabWidget::pinnedCount() const {
         }
     }
     return countPinned;
+}
+
+void FilesTabWidget::setWordWrapSlot(bool checked){
+    emit setWordWrapSignal(checked);
+}
+
+void FilesTabWidget::setTabReplaceSlot(bool checked){
+    emit setTabReplaceSignal(checked);
+}
+
+void FilesTabWidget::setTabWidthSlot(int width){
+    emit setTabWidthSignal(width);
 }

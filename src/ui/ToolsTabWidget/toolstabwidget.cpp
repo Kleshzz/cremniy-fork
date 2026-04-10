@@ -110,6 +110,10 @@ ToolTab* ToolsTabWidget::createToolTab(const QString& toolId)
     connect(tab, &ToolTab::modifyData, this, &ToolsTabWidget::setupStar);
     connect(tab, &ToolTab::dataEqual, this, &ToolsTabWidget::removeStar);
 
+    connect(this, &ToolsTabWidget::setWordWrapSignal, tab, &ToolTab::setWordWrapSlot);
+    connect(this, &ToolsTabWidget::setTabReplaceSignal, tab, &ToolTab::setTabReplaceSlot);
+    connect(this, &ToolsTabWidget::setTabWidthSignal, tab, &ToolTab::setTabWidthSlot);
+
     int insertIndex = count();
     if (descriptor.group == ToolTabGroup::Always) {
         for (int index = 0; index < count(); ++index) {
@@ -247,4 +251,19 @@ void ToolsTabWidget::setupStar(){
     // signal "setup star" to up
     emit setupStarSignal();
 
+}
+
+void ToolsTabWidget::setWordWrapSlot(bool checked){
+    qDebug("signal: word wrap");
+    emit setWordWrapSignal(checked);
+}
+
+void ToolsTabWidget::setTabReplaceSlot(bool checked){
+    qDebug("signal: tab replace");
+    emit setTabReplaceSignal(checked);
+}
+
+void ToolsTabWidget::setTabWidthSlot(int width){
+    qDebug("signal: tab width");
+    emit setTabWidthSignal(width);
 }

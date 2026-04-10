@@ -125,6 +125,21 @@ public slots:
      */
     virtual void saveTabData() = 0;
 
+    /**
+     * @brief Включение или отключение Word Wrap в зависимости от checked
+     */
+    virtual void setWordWrapSlot(bool checked) = 0;
+
+    /**
+     * @brief Включение или отключение замены TAB на пробелы в зависимости от checked
+     */
+    virtual void setTabReplaceSlot(bool checked) = 0;
+
+    /**
+     * @brief Устанавливает размер TAB в зависимости от width
+     */
+    virtual void setTabWidthSlot(int width) = 0;
+
 signals:
     /**
      * @brief Обновить данные из файла во всех вкладках

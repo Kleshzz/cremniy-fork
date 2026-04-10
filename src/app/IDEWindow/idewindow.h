@@ -117,5 +117,9 @@ signals:
     void saveFileSignal();
     void CloseProject();
 
+    void setWordWrapSignal(bool checked);
+    void setTabReplaceSignal(bool checked);
+    void setTabWidthSignal(int width);
+
 };
 #endif // IDEWINDOW_H

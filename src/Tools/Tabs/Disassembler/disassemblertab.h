@@ -64,6 +64,10 @@ public slots:
     void setTabData() override;
     void saveTabData() override;
 
+    void setWordWrapSlot(bool checked) override {};
+    void setTabReplaceSlot(bool checked) override {};
+    void setTabWidthSlot(int width) override {};
+
 protected slots:
     // Обработчик изменения выделения из буфера
     void onSelectionChanged(qint64 pos, qint64 length) override;

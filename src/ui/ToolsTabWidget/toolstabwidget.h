@@ -41,10 +41,18 @@ public slots:
     void removeStar();
     void setupStar();
 
+    void setWordWrapSlot(bool checked);
+    void setTabReplaceSlot(bool checked);
+    void setTabWidthSlot(int width);
+
 signals:
     void removeStarSignal();
     void setupStarSignal();
     void saveFileSignal();
+
+    void setWordWrapSignal(bool checked);
+    void setTabReplaceSignal(bool checked);
+    void setTabWidthSignal(int width);
 
 };
 
