@@ -1,0 +1,11 @@
+blank_issues_enabled:false
+contact_links:
+- name: Telegram Community
+  url: https://t.me/cremniy_com
+  about: Ask questions, get support, and discuss the project in real-time.
+- name: YouTube Channel
+  url: https://www.youtube.com/@igmunv
+  about: Watch project development process.
+- name: Roadmap
+  url: https://github.com/munirov/cremniy/blob/main/ROADMAP.md
+  about: Check planned features and current tasks before reporting issues or suggesting new features.
